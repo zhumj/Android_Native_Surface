@@ -3,13 +3,14 @@
 //
 
 #include "extern_function.h"
-#include "aosp_8/native_surface_8.h"
-#include "aosp_8_1/native_surface_8_1.h"
-#include "aosp_9/native_surface_9.h"
-#include "aosp_10/native_surface_10.h"
-#include "aosp_11/native_surface_11.h"
-#include "aosp_12/native_surface_12.h"
-#include "aosp_13/native_surface_13.h"
+#include "native_surface/aosp/native_surface_8.h"
+#include "native_surface/aosp/native_surface_8_1.h"
+#include "native_surface/aosp/native_surface_9.h"
+#include "native_surface/aosp/native_surface_10.h"
+#include "native_surface/aosp/native_surface_11.h"
+#include "native_surface/aosp/native_surface_12.h"
+#include "native_surface/aosp/native_surface_12_1.h"
+#include "native_surface/aosp/native_surface_13.h"
 
 static void *handle;// 动态库方案
 
@@ -22,6 +23,13 @@ ExternFunction::ExternFunction() {
             handle = dlblob(&native_surface_13_64, sizeof(native_surface_13_64)); // 64位支持
 #else
             handle = dlblob(&native_surface_13_32, sizeof(native_surface_13_32)); // 32位支持 <<-- 其实很没必要 未测试
+#endif
+        } else if (get_android_api_level() == /*__ANDROID_API_S__*/ 32) { // 安卓12.1支持
+            exec_native_surface("settings put global block_untrusted_touches 0");
+#ifdef __aarch64__
+            handle = dlblob(&native_surface_12_1_64, sizeof(native_surface_12_64)); // 64位支持
+#else
+            handle = dlblob(&native_surface_12_1_32, sizeof(native_surface_12_32)); // 32位支持 <<-- 其实很没必要 未测试
 #endif
         } else if (get_android_api_level() == /*__ANDROID_API_S__*/ 31) { // 安卓12支持
             exec_native_surface("settings put global block_untrusted_touches 0");
