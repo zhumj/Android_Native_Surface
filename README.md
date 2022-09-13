@@ -4,9 +4,7 @@
 
 [此项目基于 Android_Native_Surface](https://github.com/SsageParuders/Android_Native_Surface)
 
-### 克隆
-- git clone --recursive https://github.com/fgsqme/Android_Native_Surface.git
-###
+
 ### libs
 - 项目支持到 Android 9 ~ 13
 
