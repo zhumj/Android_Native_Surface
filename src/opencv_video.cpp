@@ -329,8 +329,8 @@ bool ImageViewer::handleEvent() {
 
 int main(int, char **) {
     ImageViewer gui;
-//    cv::VideoCapture video("/sdcard/a.mp4");
-    cv::VideoCapture video(2,CAP_ANDROID);
+    cv::VideoCapture video("/sdcard/a.mp4");
+//    cv::VideoCapture video(2,CAP_ANDROID);
     if (!video.isOpened()) {
         cout << "打开失败" << endl;
         return -1;

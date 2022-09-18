@@ -43,9 +43,9 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
                                                             screen_height,
                                                             android::PIXEL_FORMAT_RGBA_8888,
                                                             0);
-  /*  if (!gSurfaceControl) {
-        std::cout << "!gSurfaceControl" << std::endl;
-    } else*/ if (!gSurfaceControl->isValid()) {
+    /*  if (!gSurfaceControl) {
+          std::cout << "!gSurfaceControl" << std::endl;
+      } else*/ if (!gSurfaceControl->isValid()) {
         std::cout << "!gSurfaceControl->isValid()" << std::endl;
     } else {
         // TODO: !BUGS FINDED : Vector<> have different types
@@ -68,8 +68,8 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
 
 
 MDisplayInfo getDisplayInfo() {
-    sp<IBinder> token(SurfaceComposerClient::getBuiltInDisplay(
-            ISurfaceComposer::eDisplayIdMain));
+    sp <IBinder> token = SurfaceComposerClient::getInternalDisplayToken();
+
     DisplayInfo mainDisplayInfo;
     // 获取手机的屏幕信息
     status_t err = SurfaceComposerClient::getDisplayInfo(token, &mainDisplayInfo);
