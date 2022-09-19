@@ -5,6 +5,14 @@
 
 int main(int argc, char *argv[]) {
     screen_config();
+
+    while (true) {
+       MDisplayInfo d = externFunction.getDisplayInfo();
+        cout << "width:" << d.width << " height:" << d.height << " orientation:"
+             << d.orientation << endl;
+        std::this_thread::sleep_for(1s);
+
+    }
     cout << "height:" << displayInfo.height << " width:" << displayInfo.width << " orientation:"
          << displayInfo.orientation << endl;
 

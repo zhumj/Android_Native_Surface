@@ -29,7 +29,8 @@ using namespace android;
  */
 // typedef ... NativeWindowType;
 
-NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) {
+NativeWindowType
+createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) {
 
     if (author) {
         std::cout << "Free SoftWare From GitHub: https://github.com/SsageParuders/Android_Native_Surface" << std::endl;
@@ -78,10 +79,20 @@ MDisplayInfo getDisplayInfo() {
         std::cout << "getDisplayInfo err...." << std::endl;
         return mDisplayInfo;
     }
-    //屏幕宽
-    mDisplayInfo.width = mainDisplayInfo.w;
-    //屏幕高
-    mDisplayInfo.height = mainDisplayInfo.h;
+
+    if (mainDisplayInfo.orientation == DISPLAY_ORIENTATION_90 ||
+        mainDisplayInfo.orientation == DISPLAY_ORIENTATION_270) {
+        //屏幕宽
+        mDisplayInfo.width = mainDisplayInfo.h;
+        //屏幕高
+        mDisplayInfo.height = mainDisplayInfo.w;
+    } else {
+        //屏幕宽
+        mDisplayInfo.width = mainDisplayInfo.w;
+        //屏幕高
+        mDisplayInfo.height = mainDisplayInfo.h;
+    }
+
     mDisplayInfo.orientation = mainDisplayInfo.orientation;
     return mDisplayInfo;
 }

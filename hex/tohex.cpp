@@ -8,7 +8,7 @@ using namespace std;
 
 
 int main(int argv, char **argc) {
-    ifstream in_file("D:\\Project\\C++\\Android_Native_Surface\\libs\\arm64-v8a\\aosp_8\\libSsage.so",
+    ifstream in_file("D:\\Project\\C++\\Android_Native_Surface\\libs\\arm64-v8a\\aosp_10\\libSsage.so",
                      ios::in | ios::binary);
     filebuf buf;
     buf.open("out.h", ios::out);

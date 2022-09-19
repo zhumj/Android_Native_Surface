@@ -69,7 +69,7 @@ ExternFunction::ExternFunction() {
             handle = dlblob(&native_surface_8_32, sizeof(native_surface_8_32)); // 32位支持 <<-- 其实很没必要 未测试
 #endif
         } else {
-            printf("Sorry, level:%d Don't Support~", get_android_api_level());
+            printf("Sorry, level:%d Don't Support~\n", get_android_api_level());
             exit(0);
         }
     }
