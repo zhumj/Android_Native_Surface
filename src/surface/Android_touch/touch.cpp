@@ -104,17 +104,14 @@ void touch_config() {
         if (g_Initialized) {
             if (read(touch_device_fd, &event, sizeof(event)) > 0) {
                 if (event.type == EV_SYN && event.code == SYN_REPORT && event.value == 0) {
-                    bool flag = false;
-                    int status = IM_UP;
+                    int status = IM_MOVE;
                     for (input_event e: events) {
                         switch (e.type) {
                             case EV_KEY: {
                                 if (e.code == BTN_TOUCH) {
                                     if (e.value == DOWN) {
-                                        flag = true;
                                         status = IM_DOWN;
                                     } else if (e.value == UP) {
-                                        flag = true;
                                         status = IM_UP;
                                         break;
                                     }
@@ -129,10 +126,6 @@ void touch_config() {
                                 }
                             }
                         }
-                    }
-
-                    if (!flag) {
-                        status = IM_MOVE;
                     }
                     events.clear();
 
