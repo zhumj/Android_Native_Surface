@@ -36,6 +36,7 @@ ExternFunction::ExternFunction() {
 #else
             handle = dlblob(&native_surface_12_32, sizeof(native_surface_12_32)); // 32位支持 <<-- 其实很没必要 未测试
 #endif
+            funcPointer.func_more_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjjjb");
         } else if (get_android_api_level() == /*__ANDROID_API_R__*/ 30) { // 安卓11支持
 #ifdef __aarch64__
             handle = dlblob(&native_surface_11_64, sizeof(native_surface_11_64)); // 64位支持
@@ -59,6 +60,7 @@ ExternFunction::ExternFunction() {
             exit(0);
         }
     }
+
     funcPointer.func_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjb");
     // 获取屏幕信息
     funcPointer.func_getDisplayInfo = dlsym(handle, "_Z14getDisplayInfov");
@@ -81,8 +83,27 @@ ExternFunction::createNativeWindow(const char *surface_name, uint32_t screen_wid
 }
 
 /**
+ * (更多可选参数_暂时只支持安卓12)创建 native surface
+ * @param surface_name 创建名称
+ * @param screen_width 创建宽度
+ * @param screen_height 创建高度
+ * @param format format
+ * @param flags flags
+ * @param author 是否打印作者信息
+ * @return
+ */
+ANativeWindow *
+ExternFunction::createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height,
+                                   uint32_t format, uint32_t flags, bool author) const {
+    return ((ANativeWindow *(*)(
+            const char *, uint32_t, uint32_t, uint32_t, uint32_t, bool))
+            (funcPointer.func_more_createNativeWindow))(surface_name, screen_width, screen_height, format, flags, author);
+}
+
+/**
  * 获取屏幕宽高以及旋转状态
  */
 MDisplayInfo ExternFunction::getDisplayInfo() const {
     return ((MDisplayInfo (*)()) (funcPointer.func_getDisplayInfo))();
 }
+

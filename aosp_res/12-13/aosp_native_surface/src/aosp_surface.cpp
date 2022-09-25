@@ -1,7 +1,7 @@
 /*
  * Codes from SsageParuders[https://github.com/SsageParuders]
  * 代码由泓清提供
-*/
+ */
 #include "aosp_surface.h"
 
 #include <iostream>
@@ -36,15 +36,28 @@ createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t scr
         std::cout << "Made by SsageParuders[泓清]" << std::endl;
     }
 
+    return createNativeWindow(surface_name, screen_width, screen_height, android::PIXEL_FORMAT_RGBA_8888, 0, author);
+}
+
+NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height,
+                                    uint32_t format, uint32_t flags, bool author) {
+
+    if (author) {
+        std::cout << "Free SoftWare From GitHub: https://github.com/SsageParuders/Android_Native_Surface" << std::endl;
+        std::cout << "Made by SsageParuders[泓清]" << std::endl;
+    }
+
     NativeWindowType ret = nullptr;
     gSurfaceComposerClient = android::sp < android::SurfaceComposerClient > {new android::SurfaceComposerClient()};
     gSurfaceControl = gSurfaceComposerClient->createSurface(android::String8(surface_name),
                                                             screen_width,
                                                             screen_height,
-                                                            android::PIXEL_FORMAT_RGBA_8888,
-                                                            0);
-    if (gSurfaceControl == NULL || !gSurfaceControl->isValid()) {
-        std::cout << "Failed to create SurfaceControl." << std::endl;
+                                                            format,
+                                                            flags);
+    if (!gSurfaceControl) {
+        std::cout << "!gSurfaceControl" << std::endl;
+    } else if (!gSurfaceControl->isValid()) {
+        std::cout << "!gSurfaceControl->isValid()" << std::endl;
     } else {
         // TODO: !BUGS FINDED : Vector<> have different types
         // fixed bugs from aosp & miui | see https://github.com/DeviceFarmer/minicap/issues/6
@@ -53,7 +66,7 @@ createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t scr
          * [+] uint8_t _dummy[16]; // patch Google AOSP & MIUI
          * [ ] status_t write(Parcel& output) const;
          * [ ] status_t read(const Parcel& input);
-        */
+         */
         // android::SurfaceComposerClient::Transaction{}
         //         .setLayer(gSurfaceControl, INT_MAX)
         //         .show(gSurfaceControl)
@@ -63,7 +76,6 @@ createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t scr
     }
     return ret;
 }
-
 
 MDisplayInfo getDisplayInfo() {
     sp <IBinder> token = SurfaceComposerClient::getInternalDisplayToken();

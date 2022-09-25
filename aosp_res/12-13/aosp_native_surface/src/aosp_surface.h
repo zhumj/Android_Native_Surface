@@ -15,4 +15,7 @@ struct MDisplayInfo {
 NativeWindowType
 createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author);
 
+NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height,
+                                    uint32_t format, uint32_t flags, bool author);
+
 MDisplayInfo getDisplayInfo();

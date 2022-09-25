@@ -21,6 +21,8 @@ struct MDisplayInfo {
 // 方法指针
 struct FuncPointer {
     void *func_createNativeWindow;
+    //    更多可选参数
+    void *func_more_createNativeWindow;
     void *func_getDisplayInfo;
 };
 
@@ -41,6 +43,20 @@ public:
      */
     ANativeWindow *
     createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) const;
+
+    /**
+     * (更多可选参数_暂时只支持安卓12)创建 native surface
+     * @param surface_name 创建名称
+     * @param screen_width 创建宽度
+     * @param screen_height 创建高度
+     * @param format format
+     * @param flags flags
+     * @param author 是否打印作者信息
+     * @return
+     */
+    ANativeWindow *
+    createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, uint32_t format,
+                       uint32_t flags, bool author) const;
 
     /**
      * 获取屏幕宽高以及旋转状态
