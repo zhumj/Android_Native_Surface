@@ -93,13 +93,11 @@ void touch_config() {
     if (touch_device_fd < 0) {
         printf("Open dev Error\n");
     }
-
     // 触摸事件队列
-    std::vector<input_event> events;
+    std::vector <input_event> events;
     int eventX = 0, eventY = 0;
     input_event event{};
     ImVec2 touch_screen_size = getTouchScreenDimension(touch_device_fd);
-    bool touchFlag = true;
     while (true) {
         if (g_Initialized) {
             if (read(touch_device_fd, &event, sizeof(event)) > 0) {
@@ -127,13 +125,13 @@ void touch_config() {
                             }
                         }
                     }
+
                     events.clear();
 
                     ImVec2 point = rotatePointx(displayInfo.orientation, {(float) eventX, (float) eventY},
-                                                 touch_screen_size);
-
-                    ImVec2 newEvent((point.x * displayInfo.width) / touch_screen_size.x, (point.y * displayInfo.height)
-                                                                                         / touch_screen_size.y);
+                                                touch_screen_size);
+                    ImVec2 newEvent((point.x * displayInfo.width) / touch_screen_size.x,
+                                    (point.y * displayInfo.height) / touch_screen_size.y);
                     ImGuInputEvent imGuInputEvent{};
                     imGuInputEvent.pos = newEvent;
                     if (status == IM_DOWN) {           // 按下
