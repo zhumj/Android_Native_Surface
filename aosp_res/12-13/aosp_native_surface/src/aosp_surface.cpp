@@ -30,12 +30,6 @@ using namespace android;
 
 NativeWindowType
 createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) {
-
-    if (author) {
-        std::cout << "Free SoftWare From GitHub: https://github.com/SsageParuders/Android_Native_Surface" << std::endl;
-        std::cout << "Made by SsageParuders[泓清]" << std::endl;
-    }
-
     return createNativeWindow(surface_name, screen_width, screen_height, android::PIXEL_FORMAT_RGBA_8888, 0, author);
 }
 
@@ -54,7 +48,7 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
                                                             screen_height,
                                                             format,
                                                             flags);
-    if (!gSurfaceControl) {
+    if (gSurfaceControl == NULL) {
         std::cout << "!gSurfaceControl" << std::endl;
     } else if (!gSurfaceControl->isValid()) {
         std::cout << "!gSurfaceControl->isValid()" << std::endl;
