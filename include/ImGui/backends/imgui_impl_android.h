@@ -30,6 +30,7 @@ struct ANativeWindow;
 struct AInputEvent;
 struct ImGuInputEvent {
     int type;
+    int fingerIndex;
     ImVec2 pos;
 };
 IMGUI_IMPL_API bool     ImGui_ImplAndroid_Init(ANativeWindow* window = NULL);

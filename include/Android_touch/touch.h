@@ -20,12 +20,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
-#include <hbase.h>
-#include <hdir.h>
-#include <hlog.h>
-#include <hloop.h>
-#include <hmain.h>
-#include <hv.h>
 #include <queue>
 #include <random>
 #include <string>

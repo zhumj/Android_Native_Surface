@@ -24,6 +24,10 @@ struct FuncPointer {
     //    更多可选参数
     void *func_more_createNativeWindow;
     void *func_getDisplayInfo;
+    void *func_setSurfaceWH;
+    void *func_runRecord;
+    void *func_stopRecord;
+    void *func_initRecord;
 };
 
 
@@ -62,6 +66,30 @@ public:
      * 获取屏幕宽高以及旋转状态
      */
     MDisplayInfo getDisplayInfo() const;
+
+    /**
+     * 设置画布大小
+     * @param width
+     * @param height
+     */
+    void setSurfaceWH(uint32_t width, uint32_t height) const;
+
+    /**
+     * 录屏初始化(安卓12)
+     */
+    void initRecord() const;
+
+    /**
+     * 开始录屏(安卓12)
+     * @param gStopRequested
+     * @param callback
+     */
+    void runRecord(bool *gStopRequested, void callback(uint8_t *, size_t)) const;
+
+    /**
+     * 录屏结束调用
+     */
+    void stopRecord() const;
 
 };
 

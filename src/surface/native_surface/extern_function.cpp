@@ -36,7 +36,7 @@ ExternFunction::ExternFunction() {
 #else
             handle = dlblob(&native_surface_12_32, sizeof(native_surface_12_32)); // 32位支持 <<-- 其实很没必要 未测试
 #endif
-            funcPointer.func_more_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjjjb");
+//            funcPointer.func_more_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjjjb");
         } else if (get_android_api_level() == /*__ANDROID_API_R__*/ 30) { // 安卓11支持
 #ifdef __aarch64__
             handle = dlblob(&native_surface_11_64, sizeof(native_surface_11_64)); // 64位支持
@@ -64,6 +64,11 @@ ExternFunction::ExternFunction() {
     funcPointer.func_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjb");
     // 获取屏幕信息
     funcPointer.func_getDisplayInfo = dlsym(handle, "_Z14getDisplayInfov");
+    funcPointer.func_setSurfaceWH = dlsym(handle, "_Z12setSurfaceWHjj");
+    funcPointer.func_initRecord = dlsym(handle, "_Z10initRecordv");
+    funcPointer.func_runRecord = dlsym(handle, "_Z9runRecordPbPFvPhmE");
+    funcPointer.func_stopRecord = dlsym(handle, "_Z10stopRecordv");
+
 }
 
 /**
@@ -97,7 +102,8 @@ ExternFunction::createNativeWindow(const char *surface_name, uint32_t screen_wid
                                    uint32_t format, uint32_t flags, bool author) const {
     return ((ANativeWindow *(*)(
             const char *, uint32_t, uint32_t, uint32_t, uint32_t, bool))
-            (funcPointer.func_more_createNativeWindow))(surface_name, screen_width, screen_height, format, flags, author);
+            (funcPointer.func_more_createNativeWindow))(surface_name, screen_width, screen_height, format, flags,
+                                                        author);
 }
 
 /**
@@ -107,3 +113,28 @@ MDisplayInfo ExternFunction::getDisplayInfo() const {
     return ((MDisplayInfo (*)()) (funcPointer.func_getDisplayInfo))();
 }
 
+void ExternFunction::setSurfaceWH(uint32_t width, uint32_t height) const {
+    return ((void (*)(uint32_t, uint32_t)) (funcPointer.func_setSurfaceWH))(width, height);
+}
+
+/**
+ * 录屏初始化(安卓12)
+ */
+void ExternFunction::initRecord() const {
+    ((void (*)()) (funcPointer.func_initRecord))();
+}
+
+/**
+ * 开始录屏(安卓12)
+ * @param gStopRequested
+ * @param callback
+ */
+void ExternFunction::runRecord(bool *gStopRequested, void (*callback)(uint8_t *, size_t)) const {
+    ((void (*)(bool *, void(uint8_t *, size_t))) (funcPointer.func_runRecord))(gStopRequested, callback);
+}
+/**
+ * 录屏结束调用
+ */
+void ExternFunction::stopRecord() const {
+    ((void (*)()) (funcPointer.func_stopRecord))();
+}

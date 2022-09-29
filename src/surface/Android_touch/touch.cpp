@@ -53,7 +53,6 @@ std::string getTouchScreenDevice() {
     return "";
 }
 
-ImVec2 imVec2;
 
 ImVec2 rotatePointx(uint32_t orientation, ImVec2 mxy, ImVec2 wh) {
     if (orientation == 0) {
@@ -61,14 +60,14 @@ ImVec2 rotatePointx(uint32_t orientation, ImVec2 mxy, ImVec2 wh) {
     }
     ImVec2 xy(mxy.x, mxy.y);
     if (orientation == 3) {
-        xy.x = (float) wh.y - imVec2.y;
-        xy.y = imVec2.x;
+        xy.x = (float) wh.y - mxy.y;
+        xy.y = mxy.x;
     } else if (orientation == 2) {
-        xy.x = (float) wh.x - imVec2.x;
-        xy.y = (float) wh.y - imVec2.y;
+        xy.x = (float) wh.x - mxy.x;
+        xy.y = (float) wh.y - mxy.y;
     } else if (orientation == 1) {
-        xy.x = imVec2.y;
-        xy.y = (float) wh.x - imVec2.x;
+        xy.x = mxy.y;
+        xy.y = (float) wh.x - mxy.x;
     }
     return xy;
 }
@@ -80,10 +79,16 @@ ImVec2 getTouchScreenDimension(int fd) {
     return {(float) abs_x[2], (float) abs_y[2]};
 }
 
+MDisplayInfo getTouchDisplyInfo() {
+    if (displayInfo.orientation == 0 || displayInfo.orientation == 2) {
+        return displayInfo;
+    } else {
+        return {displayInfo.height, displayInfo.width, displayInfo.orientation};
+    }
+}
+
 
 void touch_config() {
-//    initVirtualTouch();
-
     std::string device = getTouchScreenDevice();
     // printf("touch event : %s\n",device.c_str());
     if (device.length() < 2) {
@@ -94,29 +99,34 @@ void touch_config() {
         printf("Open dev Error\n");
     }
     // 触摸事件队列
-    std::vector <input_event> events;
+    vector<input_event> events;
+    // 手指编号
+    int fingerIndex = 0;
+    // 触摸位置
     int eventX = 0, eventY = 0;
     input_event event{};
     ImVec2 touch_screen_size = getTouchScreenDimension(touch_device_fd);
-    while (true) {
-        if (g_Initialized) {
-            if (read(touch_device_fd, &event, sizeof(event)) > 0) {
-                if (event.type == EV_SYN && event.code == SYN_REPORT && event.value == 0) {
-                    int status = IM_MOVE;
-                    for (input_event e: events) {
-                        switch (e.type) {
-                            case EV_KEY: {
-                                if (e.code == BTN_TOUCH) {
-                                    if (e.value == DOWN) {
-                                        status = IM_DOWN;
-                                    } else if (e.value == UP) {
-                                        status = IM_UP;
-                                        break;
-                                    }
+    while (g_Initialized) {
+        if (read(touch_device_fd, &event, sizeof(event)) > 0) {
+            if (event.type == EV_SYN && event.code == SYN_REPORT && event.value == 0) {
+                int status = IM_MOVE;
+                for (input_event e: events) {
+                    switch (e.type) {
+                        case EV_KEY: {
+                            if (e.code == BTN_TOUCH) {
+                                if (e.value == DOWN) {
+                                    status = IM_DOWN;
+                                } else if (e.value == UP) {
+                                    status = IM_UP;
+                                    break;
                                 }
-                                break;
                             }
-                            case EV_ABS: {
+                            break;
+                        }
+                        case EV_ABS: {
+                            if (e.code == ABS_MT_SLOT) {
+                                fingerIndex = e.value;
+                            } else if (fingerIndex == 0) {
                                 if (e.code == ABS_MT_POSITION_X) {
                                     eventX = e.value;
                                 } else if (e.code == ABS_MT_POSITION_Y) {
@@ -125,34 +135,41 @@ void touch_config() {
                             }
                         }
                     }
-
-                    events.clear();
-
-                    ImVec2 point = rotatePointx(displayInfo.orientation, {(float) eventX, (float) eventY},
-                                                touch_screen_size);
-                    ImVec2 newEvent((point.x * displayInfo.width) / touch_screen_size.x,
-                                    (point.y * displayInfo.height) / touch_screen_size.y);
-                    ImGuInputEvent imGuInputEvent{};
-                    imGuInputEvent.pos = newEvent;
-                    if (status == IM_DOWN) {           // 按下
-//                        printf("down x:%f y:%f\n", newEvent.x, newEvent.y);
-                        imGuInputEvent.type = IM_DOWN;
-                    } else if (status == IM_MOVE) {    // 移动
-//                        printf("move x:%f y:%f\n", newEvent.x, newEvent.y);
-                        imGuInputEvent.type = IM_MOVE;
-                    } else {                           // 放开
-//                        printf("up\n");
-                        imGuInputEvent.type = IM_UP;
-                    }
-                    ImGui_ImplLinux_HandleInputEvent(imGuInputEvent);
-                } else {
-                    events.push_back(event);
                 }
+
+                events.clear();
+
+                if (fingerIndex != 0) {
+                    continue;
+                }
+
+                MDisplayInfo mDisplayInfo = getTouchDisplyInfo();
+                ImVec2 point = rotatePointx(mDisplayInfo.orientation, {(float) eventX, (float) eventY},
+                                            touch_screen_size);
+                ImVec2 newEvent((point.x * (float) mDisplayInfo.width) / touch_screen_size.x,
+                                (point.y * (float) mDisplayInfo.height) / touch_screen_size.y);
+                ImGuInputEvent imGuInputEvent{};
+                imGuInputEvent.fingerIndex = fingerIndex;
+                imGuInputEvent.pos = newEvent;
+
+                if (status == IM_DOWN) {           // 按下
+//                        printf("down x:%f y:%f\n", newEvent.x, newEvent.y);
+                    imGuInputEvent.type = IM_DOWN;
+                } else if (status == IM_MOVE) {    // 移动
+//                        printf("move x:%f y:%f\n", newEvent.x, newEvent.y);
+                    imGuInputEvent.type = IM_MOVE;
+                } else {                           // 放开
+//                        printf("up\n");
+                    imGuInputEvent.type = IM_UP;
+                }
+                ImGui_ImplLinux_HandleInputEvent(imGuInputEvent);
+            } else {
+                events.push_back(event);
             }
         }
         std::this_thread::sleep_for(0.0001s);
     }
-
+    close(touch_device_fd);
     pthread_exit(0);
 }
 

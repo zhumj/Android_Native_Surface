@@ -9,50 +9,40 @@ EGLDisplay display = EGL_NO_DISPLAY;
 EGLConfig config;
 EGLSurface surface = EGL_NO_SURFACE;
 ANativeWindow *native_window;
-
 ExternFunction externFunction;
 EGLContext context = EGL_NO_CONTEXT;
 MDisplayInfo displayInfo;
-//Screen full_screen;
-//int Orientation = 0;
-//int screen_x = 0, screen_y = 0;
-
+uint32_t orientation = 0;
 bool g_Initialized = false;
 
-string exec(string command) {
-    char buffer[128];
-    string result = "";
-    // Open pipe to file
-    FILE *pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        return "popen failed!";
-    }
-    // read till end of process:
-    while (!feof(pipe)) {
-        // use buffer to read and add to result
-        if (fgets(buffer, 128, pipe) != nullptr) {
-            result += buffer;
-        }
-    }
-    pclose(pipe);
-    return result;
+bool initDraw(bool log) {
+    screen_config();
+    return initDraw(displayInfo.width, displayInfo.height, log);
 }
 
-int init_egl(int _screen_x, int _screen_y, bool log) {
+bool initDraw(uint32_t _screen_x, uint32_t _screen_y, bool log) {
+
+    if (!init_egl(_screen_x, _screen_y, log)) {
+        return false;
+    }
+    return ImGui_init();
+}
+
+bool init_egl(uint32_t _screen_x, uint32_t _screen_y, bool log) {
     native_window = externFunction.createNativeWindow("Ssage",
                                                       _screen_x, _screen_y, false);
     ANativeWindow_acquire(native_window);
     display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (display == EGL_NO_DISPLAY) {
         printf("eglGetDisplay error=%u\n", glGetError());
-        return -1;
+        return false;
     }
     if (log) {
         printf("eglGetDisplay ok\n");
     }
     if (eglInitialize(display, 0, 0) != EGL_TRUE) {
         printf("eglInitialize error=%u\n", glGetError());
-        return -1;
+        return false;
     }
     if (log) {
         printf("eglInitialize ok\n");
@@ -71,14 +61,14 @@ int init_egl(int _screen_x, int _screen_y, bool log) {
     };
     if (eglChooseConfig(display, attribList, nullptr, 0, &num_config) != EGL_TRUE) {
         printf("eglChooseConfig  error=%u\n", glGetError());
-        return -1;
+        return false;
     }
     if (log) {
         printf("num_config=%d\n", num_config);
     }
     if (!eglChooseConfig(display, attribList, &config, 1, &num_config)) {
         printf("eglChooseConfig  error=%u\n", glGetError());
-        return -1;
+        return false;
     }
     if (log) {
         printf("eglChooseConfig ok\n");
@@ -117,9 +107,9 @@ void screen_config() {
     displayInfo = externFunction.getDisplayInfo();
 }
 
-void ImGui_init() {
+bool ImGui_init() {
     if (g_Initialized) {
-        return;
+        return true;
     }
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -133,75 +123,38 @@ void ImGui_init() {
     io.Fonts->AddFontDefault(&font_cfg);
     ImGui::GetStyle().ScaleAllSizes(3.0f);
     g_Initialized = true;
+    return true;
 }
 
+void drawBegin() {
+    screen_config();
+    if (orientation != displayInfo.orientation) {
+        externFunction.setSurfaceWH(displayInfo.width, displayInfo.height);
+        orientation = displayInfo.orientation;
+        cout << " width:" << displayInfo.width << "height:" << displayInfo.height << " orientation:"
+             << displayInfo.orientation << endl;
+    }
 
-void tick() {
 
-    static ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplAndroid_NewFrame((int32_t) displayInfo.width, (int32_t) displayInfo.height);
+    ImGui::NewFrame();
+}
+
+void drawEnd() {
     ImGuiIO &io = ImGui::GetIO();
-
     glViewport(0.0f, 0.0f, (int) io.DisplaySize.x, (int) io.DisplaySize.y);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT); // GL_DEPTH_BUFFER_BIT
     glFlush();
-
     if (display == EGL_NO_DISPLAY) {
         return;
     }
-
-    // Our state
-    static bool show_demo_window = false;
-    static bool show_another_window = false;
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplAndroid_NewFrame(displayInfo.width, displayInfo.height);
-    // ImGui_ImplAndroid_NewFrame();
-    ImGui::NewFrame();
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window) {
-        ImGui::ShowDemoWindow(&show_demo_window);
-    }
-
-    { // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-        static float f = 0.0f;
-        static int counter = 0;
-        ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit4("clear color", (float *) &clear_color); // Edit 3 floats representing a color
-        if (ImGui::Button("Button")) {
-            counter++;
-        }
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-        ImGui::Text("IsWindowFocused = %d", ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow));
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-                    ImGui::GetIO().Framerate);
-        ImGui::Indent(); //另起一行制表符开始绘制Button
-        ImGui::SmallButton("2222");
-        ImGui::End();
-    }
-
-    if (show_another_window) { // 3. Show another simple window.
-        ImGui::Begin("Another Window",
-                     &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me")) {
-            show_another_window = false;
-        }
-        ImGui::End();
-    }
-//    test();
-//    ImGui::GetForegroundDrawList()->AddLine(ImVec2(0, 0), ImVec2(screen_x, screen_y), IM_COL32(255, 0, 0, 255), 4);
-
-    // Rendering
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     eglSwapBuffers(display, surface);
 }
+
 
 void shutdown() {
     if (!g_Initialized) {
@@ -225,4 +178,5 @@ void shutdown() {
     context = EGL_NO_CONTEXT;
     surface = EGL_NO_SURFACE;
     ANativeWindow_release(native_window);
+    g_Initialized = false;
 }

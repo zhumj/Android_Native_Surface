@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.21)
 # opencv
 set(BUILD_OPENCV OFF)
 # hv
-set(BUILD_HV ON)
+set(BUILD_HV OFF)
 # lua
 set(BUILD_LUA OFF)
 
@@ -94,13 +94,19 @@ add_executable(NativeSurface # 生成可执行文件
         src/surface.cpp
         )
 
+add_executable(NativeScreenRecord # 生成可执行文件
+        ${FILE_INCLUDES} # 头文件
+        ${FILE_SOURCES} # 源文件
+        src/screenRecord.cpp
+        )
+
 if (BUILD_OPENCV)
     add_executable(NativeOpencv # 生成可执行文件
             src/opencv.cpp # 源文件
             )
     add_executable(NativeOj
             ${FILE_SOURCES}
-            src/opencv_video.cpp
+            src/opencv.cpp
             )
     target_link_libraries(NativeOpencv PRIVATE opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video)
 
@@ -125,12 +131,18 @@ if (BUILD_LUA)
 endif ()
 
 ##################### 添加产物 #####################
-target_include_directories(${PROJECT_NAME} PRIVATE
-        ${ANDROID_NDK}/sources/android/native_app_glue
-        )
+#target_include_directories(NativeSurface PRIVATE
+#        ${ANDROID_NDK}/sources/android/native_app_glue
+#        )
 ##################### 连接库文件 #####################
 # 可以整合第三方库 需要打开注释即可
-target_link_libraries(${PROJECT_NAME} PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk hv_static
+target_link_libraries(NativeSurface PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk
+        #        opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video
+        #        hv_static
+        #        liblua_static
+        )
+
+target_link_libraries(NativeScreenRecord PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk
         #        opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video
         #        hv_static
         #        liblua_static
