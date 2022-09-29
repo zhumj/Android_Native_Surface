@@ -48,7 +48,7 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
                                                             screen_height,
                                                             format,
                                                             flags);
-    if (!gSurfaceControl) {
+    if (gSurfaceControl == NULL) {
         std::cout << "!gSurfaceControl" << std::endl;
     } else if (!gSurfaceControl->isValid()) {
         std::cout << "!gSurfaceControl->isValid()" << std::endl;
