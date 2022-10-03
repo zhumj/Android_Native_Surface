@@ -4,14 +4,24 @@
 
 [此项目基于 Android_Native_Surface](https://github.com/SsageParuders/Android_Native_Surface)
 
+### 功能
+
+- Android c++ 绘制和录屏，录屏暂时只支持安卓12
+
+### 效果图
+
+- 录屏
+  <img width="681" alt="image" src="gif/record.gif">
+- 绘制
+  <img width="681" alt="image" src="gif/imgui.gif">
 
 ### libs
+
 - 项目支持到 Android 9 ~ 13
 
 ---
 
 ### aosp_res/ android level /aosp_native_surface
-
 
 - 编译
     - 下载aosp项目，复制对应aosp_res下的安卓版本到aosp根目录的 external/aosp_native_surface

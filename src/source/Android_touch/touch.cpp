@@ -95,9 +95,13 @@ void touch_config() {
         printf("No Touch Event\n");
     }
     int touch_device_fd = open(device.c_str(), O_RDWR | O_SYNC | O_NONBLOCK);
+    //打开设备驱动写入
+
     if (touch_device_fd < 0) {
         printf("Open dev Error\n");
     }
+    // 屏蔽触摸
+//    ioctl(touch_device_fd, EVIOCGRAB, GRAB);
     // 触摸事件队列
     vector<input_event> events;
     // 手指编号
