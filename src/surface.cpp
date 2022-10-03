@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
         std::this_thread::sleep_for(1ms);
     }
     shutdown();
+    touchEnd();
     return 0;
 }
 

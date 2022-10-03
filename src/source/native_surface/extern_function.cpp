@@ -66,7 +66,7 @@ ExternFunction::ExternFunction() {
         funcPointer.func_createNativeWindow = dlsym(handle, "_Z18createNativeWindowPKcjjb");
         // 获取屏幕信息
         funcPointer.func_getDisplayInfo = dlsym(handle, "_Z14getDisplayInfov");
-        funcPointer.func_setSurfaceWH = dlsym(handle, "_Z12setSurfaceWHjj");
+//        funcPointer.func_setSurfaceWH = dlsym(handle, "_Z12setSurfaceWHjj");
         funcPointer.func_initRecord = dlsym(handle, "_Z10initRecordPKcfjj");
         funcPointer.func_runRecord = dlsym(handle, "_Z9runRecordPbPFvPhmE");
         funcPointer.func_stopRecord = dlsym(handle, "_Z10stopRecordv");
@@ -118,13 +118,13 @@ MDisplayInfo ExternFunction::getDisplayInfo() {
 }
 
 /**
- * 设置画布大小
+ * 设置画布大小(没啥用暂时屏蔽)
  * @param width
  * @param height
  */
-void ExternFunction::setSurfaceWH(uint32_t width, uint32_t height) {
-    return ((void (*)(uint32_t, uint32_t)) (funcPointer.func_setSurfaceWH))(width, height);
-}
+//void ExternFunction::setSurfaceWH(uint32_t width, uint32_t height) {
+//    return ((void (*)(uint32_t, uint32_t)) (funcPointer.func_setSurfaceWH))(width, height);
+//}
 
 /**
  * h264 录屏

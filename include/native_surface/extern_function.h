@@ -24,7 +24,7 @@ struct FuncPointer {
     //    更多可选参数
     void *func_more_createNativeWindow;
     void *func_getDisplayInfo;
-    void *func_setSurfaceWH;
+//    void *func_setSurfaceWH;
     void *func_runRecord;
     void *func_stopRecord;
     void *func_initRecord;
@@ -65,11 +65,11 @@ public:
     MDisplayInfo getDisplayInfo();
 
     /**
-     * 设置画布大小
+     * 设置画布大小(没啥用暂时屏蔽)
      * @param width
      * @param height
      */
-    void setSurfaceWH(uint32_t width, uint32_t height);
+//    void setSurfaceWH(uint32_t width, uint32_t height);
 
     /**
      * 录屏初始化

@@ -17,6 +17,7 @@ bool g_Initialized = false;
 
 bool initDraw(bool log) {
     screen_config();
+    orientation = displayInfo.orientation;
     return initDraw(displayInfo.width, displayInfo.height, log);
 }
 
@@ -130,7 +131,9 @@ bool ImGui_init() {
 void drawBegin() {
     screen_config();
     if (orientation != displayInfo.orientation) {
-        externFunction.setSurfaceWH(displayInfo.width, displayInfo.height);
+//        externFunction.setSurfaceWH(displayInfo.width, displayInfo.height);
+        shutdown();
+        initDraw();
         orientation = displayInfo.orientation;
         cout << " width:" << displayInfo.width << "height:" << displayInfo.height << " orientation:"
              << displayInfo.orientation << endl;

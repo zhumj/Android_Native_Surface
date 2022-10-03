@@ -57,4 +57,5 @@ ImVec2 rotatePointx(uint32_t orientation, ImVec2 mxy, ImVec2 wh = {0, 0});
 ImVec2 getTouchScreenDimension(int fd);
 void touch_config();
 void Init_touch_config();
+void touchEnd();
 #endif

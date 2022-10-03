@@ -87,6 +87,7 @@ MDisplayInfo getTouchDisplyInfo() {
     }
 }
 
+bool touchFlag = false;
 
 void touch_config() {
     std::string device = getTouchScreenDevice();
@@ -110,7 +111,7 @@ void touch_config() {
     int eventX = 0, eventY = 0;
     input_event event{};
     ImVec2 touch_screen_size = getTouchScreenDimension(touch_device_fd);
-    while (g_Initialized) {
+    while (touchFlag) {
         if (read(touch_device_fd, &event, sizeof(event)) > 0) {
             if (event.type == EV_SYN && event.code == SYN_REPORT && event.value == 0) {
                 int status = IM_MOVE;
@@ -178,6 +179,11 @@ void touch_config() {
 }
 
 void Init_touch_config() { // 初始化触摸设置
+    touchFlag = true;
     std::thread touch_thread(touch_config);
     touch_thread.detach();
+}
+
+void touchEnd() {
+    touchFlag = false;
 }
