@@ -54,7 +54,7 @@ void callback(uint8_t *buff, size_t size) {
 }
 
 /**
- * h264录屏测试（暂支持安卓12）
+ * h264录屏测试
  * 运行后会保存录屏数据并且使用tcp发送数据流
  * 代码 recordReceive.cpp 作为接收端
  */

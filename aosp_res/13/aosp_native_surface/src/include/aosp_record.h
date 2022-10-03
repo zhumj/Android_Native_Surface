@@ -20,6 +20,7 @@
 
 #define kVersionMajor 1
 #define kVersionMinor 3
+
 using android::status_t;
 int initScreenrecord(const char* bitRate,float fps,uint32_t videoWidth, uint32_t videoHeight);
 void stopScreenrecord();

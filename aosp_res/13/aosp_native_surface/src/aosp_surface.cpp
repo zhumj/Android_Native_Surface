@@ -3,6 +3,7 @@
  * 代码由泓清提供
  */
 #include "aosp_surface.h"
+#include "aosp_record.h"
 
 #include <iostream>
 #include <thread>
@@ -13,10 +14,12 @@
 #include <gui/SurfaceComposerClient.h>
 #include <ui/DisplayState.h>
 
-android::sp <android::SurfaceComposerClient> gSurfaceComposerClient;
-android::sp <android::SurfaceControl> gSurfaceControl;
-
 using namespace android;
+using namespace std;
+sp <SurfaceComposerClient> gSurfaceComposerClient;
+sp <SurfaceControl> gSurfaceControl;
+sp <IBinder> token;
+
 /*
  * Next codes mostly withaout changes from Khronos intro
  */
@@ -48,7 +51,7 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
                                                             screen_height,
                                                             format,
                                                             flags);
-    if (gSurfaceControl == NULL) {
+    if (!gSurfaceControl) {
         std::cout << "!gSurfaceControl" << std::endl;
     } else if (!gSurfaceControl->isValid()) {
         std::cout << "!gSurfaceControl->isValid()" << std::endl;
@@ -71,18 +74,34 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
     return ret;
 }
 
-sp <IBinder> token;
+void setSurfaceWH(uint32_t width, uint32_t height) {
+    android::SurfaceComposerClient::Transaction{}
+            .setLayer(gSurfaceControl, INT_MAX)
+            .show(gSurfaceControl)
+            .setPosition(gSurfaceControl, width, height)
+            .apply();
+}
 
-void *getDisplayToken() {
-    token = SurfaceComposerClient::getInternalDisplayToken();
-    return (void *) &token;
+
+sp <IBinder> getMDisplayToken() {
+    if (!token) {
+        sp <IBinder> binder = SurfaceComposerClient::getInternalDisplayToken();
+        if (binder) {
+            // std::cout << "getDisplayToken ok...." << std::endl;
+            token = binder;
+        } else {
+            std::cout << "getDisplayToken err...." << std::endl;
+            return NULL;
+        }
+    }
+    return token;
 }
 
 MDisplayInfo getDisplayInfo() {
-    sp <IBinder> token = SurfaceComposerClient::getInternalDisplayToken();
+    sp <IBinder> localToken = getMDisplayToken();
     ui::DisplayState state;
     // 获取手机的屏幕信息
-    status_t err = SurfaceComposerClient::getDisplayState(token, &state);
+    status_t err = SurfaceComposerClient::getDisplayState(localToken, &state);
     MDisplayInfo mDisplayInfo;
     if (err != NO_ERROR) {
         std::cout << "getDisplayInfo err...." << std::endl;
@@ -96,11 +115,28 @@ MDisplayInfo getDisplayInfo() {
     return mDisplayInfo;
 }
 
-// void DisplayStateCallback(callback(MDisplayInfo)){
-//    MDisplayInfo display = getDisplayInfo();
-//    callback(display);
-// }
+void runRecord(bool *runFlag, void callback(uint8_t *, size_t)) {
+    runEncoder(runFlag, callback);
+}
 
+NativeWindowType getRecordNativeWindow() {
+    return getRecordWindow();
+}
+
+void initRecord(const char *bitRate, float fps,
+                uint32_t videoWidth, uint32_t videoHeight) {
+    initScreenrecord(bitRate, fps, videoWidth, videoHeight);
+}
+
+void stopRecord() {
+    stopScreenrecord();
+}
+
+// void destroy1(){
+//     if (gSurfaceControl && gSurfaceControl->isValid()) {
+//         gSurfaceControl->destroy();
+//     }
+// }
 /* backed
     // if ( NULL == gSurfaceComposerClient.get() ) {
     //     printf("Unable to establish connection to Surface Composer \n");

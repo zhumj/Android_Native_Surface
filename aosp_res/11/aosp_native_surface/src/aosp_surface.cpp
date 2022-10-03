@@ -1,8 +1,9 @@
 /*
  * Codes from SsageParuders[https://github.com/SsageParuders]
  * 代码由泓清提供
-*/
+ */
 #include "aosp_surface.h"
+#include "aosp_record.h"
 
 #include <iostream>
 #include <thread>
@@ -13,10 +14,14 @@
 #include <gui/SurfaceComposerClient.h>
 #include <ui/DisplayState.h>
 
-android::sp <android::SurfaceComposerClient> gSurfaceComposerClient;
-android::sp <android::SurfaceControl> gSurfaceControl;
-
 using namespace android;
+using namespace std;
+
+
+sp <SurfaceComposerClient> gSurfaceComposerClient;
+sp <SurfaceControl> gSurfaceControl;
+sp <IBinder> token;
+
 /*
  * Next codes mostly withaout changes from Khronos intro
  */
@@ -28,7 +33,13 @@ using namespace android;
  */
 // typedef ... NativeWindowType;
 
-NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) {
+NativeWindowType
+createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) {
+    return createNativeWindow(surface_name, screen_width, screen_height, android::PIXEL_FORMAT_RGBA_8888, 0, author);
+}
+
+NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height,
+                                    uint32_t format, uint32_t flags, bool author) {
 
     if (author) {
         std::cout << "Free SoftWare From GitHub: https://github.com/SsageParuders/Android_Native_Surface" << std::endl;
@@ -40,8 +51,8 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
     gSurfaceControl = gSurfaceComposerClient->createSurface(android::String8(surface_name),
                                                             screen_width,
                                                             screen_height,
-                                                            android::PIXEL_FORMAT_RGBA_8888,
-                                                            0);
+                                                            format,
+                                                            flags);
     if (!gSurfaceControl) {
         std::cout << "!gSurfaceControl" << std::endl;
     } else if (!gSurfaceControl->isValid()) {
@@ -54,7 +65,7 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
          * [+] uint8_t _dummy[16]; // patch Google AOSP & MIUI
          * [ ] status_t write(Parcel& output) const;
          * [ ] status_t read(const Parcel& input);
-        */
+         */
         // android::SurfaceComposerClient::Transaction{}
         //         .setLayer(gSurfaceControl, INT_MAX)
         //         .show(gSurfaceControl)
@@ -65,12 +76,34 @@ NativeWindowType createNativeWindow(const char *surface_name, uint32_t screen_wi
     return ret;
 }
 
+void setSurfaceWH(uint32_t width, uint32_t height) {
+    android::SurfaceComposerClient::Transaction{}
+            .setLayer(gSurfaceControl, INT_MAX)
+            .show(gSurfaceControl)
+            .setPosition(gSurfaceControl, width, height)
+            .apply();
+}
+
+
+sp <IBinder> getMDisplayToken() {
+    if (!token) {
+        sp<IBinder> binder = SurfaceComposerClient::getInternalDisplayToken();
+        if (binder) {
+            // std::cout << "getDisplayToken ok...." << std::endl;
+            token = binder;
+        } else {
+            std::cout << "getDisplayToken err...." << std::endl;
+            return NULL;
+        }
+    }
+    return token;
+}
 
 MDisplayInfo getDisplayInfo() {
-    sp<IBinder> token = SurfaceComposerClient::getInternalDisplayToken();
+    sp <IBinder> localToken = getMDisplayToken();
     ui::DisplayState state;
     // 获取手机的屏幕信息
-    status_t err = SurfaceComposerClient::getDisplayState(token, &state);
+    status_t err = SurfaceComposerClient::getDisplayState(localToken, &state);
     MDisplayInfo mDisplayInfo;
     if (err != NO_ERROR) {
         std::cout << "getDisplayInfo err...." << std::endl;
@@ -84,6 +117,28 @@ MDisplayInfo getDisplayInfo() {
     return mDisplayInfo;
 }
 
+void runRecord(bool *runFlag, void callback(uint8_t *, size_t)) {
+    runEncoder(runFlag, callback);
+}
+
+NativeWindowType getRecordNativeWindow() {
+    return getRecordWindow();
+}
+
+void initRecord(const char *bitRate, float fps,
+                uint32_t videoWidth, uint32_t videoHeight) {
+    initScreenrecord(bitRate, fps, videoWidth, videoHeight);
+}
+
+void stopRecord() {
+    stopScreenrecord();
+}
+
+// void destroy1(){
+//     if (gSurfaceControl && gSurfaceControl->isValid()) {
+//         gSurfaceControl->destroy();
+//     }
+// }
 /* backed
     // if ( NULL == gSurfaceComposerClient.get() ) {
     //     printf("Unable to establish connection to Surface Composer \n");

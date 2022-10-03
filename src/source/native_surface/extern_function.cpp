@@ -92,7 +92,7 @@ ExternFunction::createNativeWindow(const char *surface_name, uint32_t screen_wid
 }
 
 /**
- * (更多可选参数_暂时只支持安卓12)创建 native surface
+ * (更多可选参数)创建 native surface
  * @param surface_name 创建名称
  * @param screen_width 创建宽度
  * @param screen_height 创建高度
@@ -128,7 +128,7 @@ void ExternFunction::setSurfaceWH(uint32_t width, uint32_t height) {
 
 /**
  * h264 录屏
- * 录屏初始化(安卓12)
+ * 录屏初始化
  * @param bitRate 码率 <= 200M
  * @param fps (设置了没用就很奇怪)
  * @param videoWidth 录制视频宽度，设置0为默认屏幕宽
@@ -141,7 +141,7 @@ void ExternFunction::initRecord(const char *bitRate, float fps,
 }
 
 /**
- * 获取录屏window(安卓12，有bug暂时无用)
+ * 获取录屏window(有bug暂时无用)
  * @return
  */
 ANativeWindow *ExternFunction::getRecordNativeWindow() {
@@ -149,7 +149,7 @@ ANativeWindow *ExternFunction::getRecordNativeWindow() {
 }
 
 /**
- * 开始录屏(安卓12)
+ * 开始录屏
  * @param gStopRequested
  * @param callback
  */

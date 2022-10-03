@@ -6,18 +6,22 @@
 
 ### 功能
 
-- Android c++ 绘制和录屏，录屏暂时只支持安卓12
-
-### 效果图
-
-- 录屏
-  <img width="681" alt="image" src="gif/record.gif">
-- 绘制
-  <img width="681" alt="image" src="gif/imgui.gif">
+- Android c++ 绘制和录屏，目前只测试了安卓12和12.1，其他版本需要自行测试
 
 ### libs
 
 - 项目支持到 Android 9 ~ 13
+
+---
+
+### 效果图
+
+- 录屏
+  <br> <br>
+  <img width="300" alt="image" src="gif/record.gif">
+- 绘制
+  <br> <br>
+  <img width="300" alt="image" src="gif/imgui.gif">
 
 ---
 

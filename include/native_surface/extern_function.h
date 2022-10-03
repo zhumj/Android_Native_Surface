@@ -46,7 +46,7 @@ public:
     createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author);
 
     /**
-     * (更多可选参数_暂时只支持安卓12)创建 native surface
+     * (更多可选参数)创建 native surface
      * @param surface_name 创建名称
      * @param screen_width 创建宽度
      * @param screen_height 创建高度
@@ -72,13 +72,13 @@ public:
     void setSurfaceWH(uint32_t width, uint32_t height);
 
     /**
-     * 录屏初始化(安卓12)
+     * 录屏初始化
      */
     void initRecord(const char *bitRate, float fps,
                     uint32_t videoWidth = 0, uint32_t videoHeight = 0);
 
     /**
-     * 开始录屏(安卓12)
+     * 开始录屏
      * @param gStopRequested
      * @param callback
      */
@@ -90,7 +90,7 @@ public:
     void stopRecord();
 
     /**
-     * 获取录屏window(安卓12，有bug暂时无用)
+     * 获取录屏window
      * @return
      */
     ANativeWindow *getRecordNativeWindow();
