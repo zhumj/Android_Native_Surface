@@ -1,5 +1,5 @@
 //
-// Created by user on 2022/9/9.
+// Created by fgsqme on 2022/9/9.
 //
 
 #ifndef NATIVESURFACE_EXTERN_FUNCTION_H
@@ -28,14 +28,11 @@ struct FuncPointer {
     void *func_runRecord;
     void *func_stopRecord;
     void *func_initRecord;
+    void *func_getRecordNativeWindow;
 };
-
 
 class ExternFunction {
 public:
-
-    FuncPointer funcPointer{};
-
     ExternFunction();
 
     /**
@@ -46,7 +43,7 @@ public:
      * @param author 是否打印作者信息
      */
     ANativeWindow *
-    createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author) const;
+    createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, bool author);
 
     /**
      * (更多可选参数_暂时只支持安卓12)创建 native surface
@@ -60,36 +57,44 @@ public:
      */
     ANativeWindow *
     createNativeWindow(const char *surface_name, uint32_t screen_width, uint32_t screen_height, uint32_t format,
-                       uint32_t flags, bool author) const;
+                       uint32_t flags, bool author);
 
     /**
      * 获取屏幕宽高以及旋转状态
      */
-    MDisplayInfo getDisplayInfo() const;
+    MDisplayInfo getDisplayInfo();
 
     /**
      * 设置画布大小
      * @param width
      * @param height
      */
-    void setSurfaceWH(uint32_t width, uint32_t height) const;
+    void setSurfaceWH(uint32_t width, uint32_t height);
 
     /**
      * 录屏初始化(安卓12)
      */
-    void initRecord() const;
+    void initRecord(const char *bitRate, float fps,
+                    uint32_t videoWidth = 0, uint32_t videoHeight = 0);
 
     /**
      * 开始录屏(安卓12)
      * @param gStopRequested
      * @param callback
      */
-    void runRecord(bool *gStopRequested, void callback(uint8_t *, size_t)) const;
+    void runRecord(bool *flag, void callback(uint8_t *, size_t));
 
     /**
      * 录屏结束调用
      */
-    void stopRecord() const;
+    void stopRecord();
+
+    /**
+     * 获取录屏window(安卓12，有bug暂时无用)
+     * @return
+     */
+    ANativeWindow *getRecordNativeWindow();
+
 
 };
 

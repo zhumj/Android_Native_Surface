@@ -3,6 +3,7 @@
  * 代码由泓清提供
  */
 #include "aosp_surface.h"
+#include "aosp_record.h"
 
 #include <iostream>
 #include <thread>
@@ -12,7 +13,6 @@
 #include <gui/Surface.h>
 #include <gui/SurfaceComposerClient.h>
 #include <ui/DisplayState.h>
-#include <screenrecord/screenrecord.h>
 
 using namespace android;
 using namespace std;
@@ -119,8 +119,13 @@ void runRecord(bool *runFlag, void callback(uint8_t *, size_t)) {
     runEncoder(runFlag, callback);
 }
 
-void initRecord() {
-    startScreenrecord();
+NativeWindowType getRecordNativeWindow() {
+    return getRecordWindow();
+}
+
+void initRecord(const char *bitRate, float fps,
+                uint32_t videoWidth, uint32_t videoHeight) {
+    initScreenrecord(bitRate, fps, videoWidth, videoHeight);
 }
 
 void stopRecord() {

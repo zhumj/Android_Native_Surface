@@ -4,14 +4,20 @@
 #include "main.h"
 
 
+/**
+ * imgui测试
+ */
+
 int main(int argc, char *argv[]) {
+    // 初始化imgui
     if (!initDraw(true)) {
-        exit(0);
+        return -1;
     }
     Init_touch_config();
     printf("Pid is %d\n", getpid());
     bool flag = true;
     while (flag) {
+        // imgui画图开始前调用
         drawBegin();
         static bool show_demo_window = false;
         static bool show_another_window = false;
@@ -53,6 +59,7 @@ int main(int argc, char *argv[]) {
             }
             ImGui::End();
         }
+        // imgui画图结束调用
         drawEnd();
         std::this_thread::sleep_for(1ms);
     }

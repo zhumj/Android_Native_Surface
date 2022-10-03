@@ -53,6 +53,8 @@ include_directories( # 设置全局头文件目录 使其他源码文件可在�
         include/Android_shm
         include/native_surface
         include/Android_draw
+        include/tools
+        ffmpeg/include
         my_android_opencv/include
         my_android_opencv/modules/highgui/include
         my_android_opencv/modules/imgcodecs/include
@@ -77,14 +79,14 @@ include_directories( # 设置全局头文件目录 使其他源码文件可在�
 
 ##################### CMake源文件设置 #####################
 FILE(GLOB_RECURSE FILE_SOURCES # 遍历子目录下所有符合情况的源文件
-        src/surface/*.c*
+        src/source/*.c*
         )
 ##################### CMake源文件设置 #####################
 
 ##################### 设置三方库文件目录 #####################
-#link_directories(
-#        libs/
-#)
+link_directories(
+        ffmpeg/lib/${ANDROID_ABI})
+
 ##################### 设置三方库文件目录 #####################
 
 ##################### 添加产物 #####################
@@ -99,20 +101,33 @@ add_executable(NativeScreenRecord # 生成可执行文件
         ${FILE_SOURCES} # 源文件
         src/screenRecord.cpp
         )
+add_executable(NativeRecordReceive # 生成可执行文件
+        ${FILE_INCLUDES} # 头文件
+        ${FILE_SOURCES} # 源文件
+        src/recordReceive.cpp
+        )
+
 
 if (BUILD_OPENCV)
     add_executable(NativeOpencv # 生成可执行文件
+            ${FILE_SOURCES} # 源文件
             src/opencv.cpp # 源文件
             )
-    add_executable(NativeOj
-            ${FILE_SOURCES}
-            src/opencv.cpp
-            )
-    target_link_libraries(NativeOpencv PRIVATE opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video)
-
-    target_link_libraries(NativeOj PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk opencv_calib3d opencv_calib3d
+    target_link_libraries(NativeOpencv PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk opencv_calib3d opencv_calib3d
             opencv_core opencv_imgproc opencv_highgui opencv_video opencv_videoio
-            opencv_video hv_static)
+            opencv_video
+            mediandk
+            avformat
+            avcodec
+            avfilter
+            swresample
+            swscale
+            avutil
+            )
+
+    #    target_link_libraries(NativeOj PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk opencv_calib3d opencv_calib3d
+    #            opencv_core opencv_imgproc opencv_highgui opencv_video opencv_videoio
+    #            opencv_video hv_static)
 endif ()
 
 if (BUILD_HV)
@@ -136,14 +151,32 @@ endif ()
 #        )
 ##################### 连接库文件 #####################
 # 可以整合第三方库 需要打开注释即可
-target_link_libraries(NativeSurface PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk
+target_link_libraries(NativeSurface PRIVATE EGL GLESv3 log android GLESv2 m dl
+        mediandk
+        avformat
+        avcodec
+        avfilter
+        swresample
+        swscale
+        avutil
         #        opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video
         #        hv_static
         #        liblua_static
         )
 
-target_link_libraries(NativeScreenRecord PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk
-        #        opencv_calib3d opencv_core opencv_imgproc opencv_highgui opencv_videoio opencv_video
+target_link_libraries(NativeScreenRecord PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk z
+        #        hv_static
+        #        liblua_static
+        )
+
+target_link_libraries(NativeRecordReceive PRIVATE EGL GLESv3 log android GLESv2 m dl mediandk z
+        mediandk
+        avformat
+        avcodec
+        avfilter
+        swresample
+        swscale
+        avutil
         #        hv_static
         #        liblua_static
         )

@@ -5,6 +5,7 @@ cc_library_shared { // 生产一个动态库
     cppflags: [ // c++编译参数
         "-Wall",
         "-Werror",
+        "-Wno-unused-parameter"
     ],
 
     header_libs: [
@@ -15,15 +16,12 @@ cc_library_shared { // 生产一个动态库
 
     srcs: [ // 源码路径
         "src/aosp_surface.cpp",
-        "screenrecord/screenrecord.cpp",
-        "screenrecord/EglWindow.cpp",
-        "screenrecord/TextRenderer.cpp",
-        "screenrecord/Overlay.cpp",
-        "screenrecord/Program.cpp",
+        "src/aosp_record.cpp",
+     
     ],
 
     local_include_dirs: [ // 头文件路径
-        "src/aosp_surface.h",
+        "src/include",
     ],
     
 
