@@ -26,7 +26,6 @@ void callback(uint8_t *buff, size_t size) {
     // fps 计算(大概，不精准)
     mlong end = TimeTools::getCurrentTime();
     totalTime += (end - currentTime);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     if (totalTime >= 1000) {
         fps = ffps;
         ffps = 0;
